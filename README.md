@@ -6,13 +6,13 @@ This is a python script that reads a zip file or a regular folder containing mul
 
 ## Requirements
 
--   Python 3
--   zipfile module
--   shutil module
--   sys module
--   glob module
--   re module
--   natsort module
+- Python 3
+- zipfile module
+- shutil module
+- sys module
+- glob module
+- re module
+- natsort module
 
 ## Usage
 
@@ -26,10 +26,10 @@ The input path can be either a zip file or a regular folder. The output path mus
 
 Suppose you have a zip file named ACQU_2023_01.zip in the raw_data directory. It contains the following files:
 
--   1.txt
--   2.txt
--   3.txt
--   aquinfo.txt
+- 1.txt
+- 2.txt
+- 3.txt
+- aquinfo.txt
 
 You want to merge the files 1.txt, 2.txt and 3.txt into one big txt file named ACQU_2023_01_data.txt. You can run the script as follows:
 
