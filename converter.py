@@ -6,7 +6,6 @@ import sys
 import glob
 import re
 import natsort
-import struct
 
 
 # A function to convert degrees, minutes, seconds (DMS) to decimal degrees (DD)

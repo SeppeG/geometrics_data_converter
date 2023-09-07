@@ -60,4 +60,3 @@ The ACQU_2023_01_data.txt file will be a binary txt file that contains the merge
 | 15    | lat       | Latitude (decimal degrees) (1Hz)                                | x.x       |   |
 | 17    | lon       | Longitude (decimal degrees) (1Hz)                               | x.x       |   |
 | 18    | alt       | Antenna altitude above/below mean sea level (1Hz)               | x.x       |   |
-|       |           |                                                                 |           |   |
