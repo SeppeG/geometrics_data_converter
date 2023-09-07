@@ -41,22 +41,22 @@ The ACQU_2023_01_data.txt file will be a binary txt file that contains the merge
 
 ## Message definition
 
-| Field | Structure | Field Description                                               | Symbol    |   |
-|-------|-----------|-----------------------------------------------------------------|-----------|---|
-| 1     | ID        | Tezzeret global millisecond counter                             |           |   |
-| 2     | Fiducial  | Increments with every magnetometer sample                       |           |   |
-| 3     | FrameID   | The fiducial number is a subset of the FrameID value            |           |   |
-| 4     | SysStat   | The two upper bits of this 16-bit word indicate GPS 1PPS status |           |   |
-| 5     | Mag1D     | Sensor 1 measurement.                                           |           |   |
-| 6     | Mag1S     | Sensor 1 status                                                 |           |   |
-| 7     | Mag2D     | Sensor 2 measurement                                            |           |   |
-| 8     | Mag2S     | Sensor 2 status                                                 |           |   |
-| 9     | Aux0      |                                                                 |           |   |
-| 10    | Aux1      |                                                                 |           |   |
-| 11    | Aux2      |                                                                 |           |   |
-| 12    | Aux3      |                                                                 |           |   |
-| 13    | Date      | Date: dd/mm/yy (1Hz)                                            | xxxxxx    |   |
-| 14    | UTC       | UTC of position (1Hz)                                           | hhmmss.ss |   |
-| 15    | lat       | Latitude (decimal degrees) (1Hz)                                | x.x       |   |
-| 17    | lon       | Longitude (decimal degrees) (1Hz)                               | x.x       |   |
-| 18    | alt       | Antenna altitude above/below mean sea level (1Hz)               | x.x       |   |
+| Field | Structure | Field Description                                               | Symbol    |
+|-------|-----------|-----------------------------------------------------------------|-----------|
+| 1     | ID        | Tezzeret global millisecond counter                             |           |
+| 2     | Fiducial  | Increments with every magnetometer sample                       |           |
+| 3     | FrameID   | The fiducial number is a subset of the FrameID value            |           |
+| 4     | SysStat   | The two upper bits of this 16-bit word indicate GPS 1PPS status |           |
+| 5     | Mag1D     | Sensor 1 measurement.                                           |           |
+| 6     | Mag1S     | Sensor 1 status                                                 |           |
+| 7     | Mag2D     | Sensor 2 measurement                                            |           |
+| 8     | Mag2S     | Sensor 2 status                                                 |           |
+| 9     | Aux0      |                                                                 |           |
+| 10    | Aux1      |                                                                 |           |
+| 11    | Aux2      |                                                                 |           |
+| 12    | Aux3      |                                                                 |           |
+| 13    | Date      | Date: dd/mm/yy (1Hz)                                            | xxxxxx    |
+| 14    | UTC       | UTC of position (1Hz)                                           | hhmmss.ss |
+| 15    | lat       | Latitude (decimal degrees) (1Hz)                                | x.x       |
+| 17    | lon       | Longitude (decimal degrees) (1Hz)                               | x.x       |
+| 18    | alt       | Antenna altitude above/below mean sea level (1Hz)               | x.x       |
