@@ -7,19 +7,47 @@ import glob
 import re
 import natsort
 
+
+# Define a function to parse the GPRMC message and return the time and date as a datetime object
+def get_date_time(fields):
+    # Check if the message is valid and has the correct number of fields
+    if len(fields) == 13:
+        # Get the time and date from the fields
+        time = fields[1]
+        date = fields[9]
+        return [date, time]
+    return None
+
+
 # Define a function to process a single file
 
 
 def process_file(file_path, output_file):
     # Open the file in binary mode
+    date_time_valid = False
     with open(file_path, "rb") as f:
         # Skip the first two lines
         f.readline()
         f.readline()
         # Read the rest of the file and write to the output file
         for line in f:
+            fields = line.split(b",")
+
+            # if the line has a GPRMC string, write it to the output file
+            if line.find(b"$GPRMC") != -1:
+                date_time = get_date_time(fields)
+                if date_time is not None:
+                    date_time_valid = True
+
             # Skip empty lines, lines that start with PPS, lines that have a special character, or lines that start with a letter
-            if line.strip() and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
+            if line.strip() and date_time_valid and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
+                # remove the newline character from the last field of original line
+                fields[-1] = fields[11].strip()
+                # add the date and time to the end of the line
+                fields.extend(date_time)
+                # add a newline character to the end of the line
+                fields[-1] += b"\r\n"
+                line = b",".join(fields)
                 output_file.write(line)
 
 # Define a function to process a zip file or a regular folder
@@ -52,7 +80,8 @@ def process_zip_or_folder(input_path, output_path):
                     # Print the current file name and number
                     print(f"Processing file {i} of {num_files}: {name}")
                     # Process the file
-                    process_file(os.path.join("temp", name), output_file)
+                    process_file(os.path.join("temp", name),
+                                 output_file)
             # Copy the aquinfo.txt file to the output folder if it exists
             aquinfo_path = os.path.join("temp", "aquinfo.txt")
             if os.path.exists(aquinfo_path):
@@ -76,7 +105,8 @@ def process_zip_or_folder(input_path, output_path):
                 # Print the current file name and number
                 print(f"Processing file {i} of {num_files}: {name}")
                 # Process the file
-                process_file(os.path.join(input_path, name), output_file)
+                process_file(os.path.join(input_path, name),
+                             output_file)
             # Copy the aquinfo.txt file to the output folder if it exists
             aquinfo_path = os.path.join(input_path, "aquinfo.txt")
             if os.path.exists(aquinfo_path):
