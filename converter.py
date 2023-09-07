@@ -6,17 +6,45 @@ import sys
 import glob
 import re
 import natsort
+import struct
 
 
-# Define a function to parse the GPRMC message and return the time and date as a datetime object
-def get_date_time(fields):
-    # Check if the message is valid and has the correct number of fields
-    if len(fields) == 13:
-        # Get the time and date from the fields
-        time = fields[1]
-        date = fields[9]
-        return [date, time]
-    return None
+# A function to convert degrees, minutes, seconds (DMS) to decimal degrees (DD)
+def dms_to_dd(degrees, minutes, seconds, direction):
+    dd = float(degrees) + float(minutes)/60 + float(seconds)/(60*60)
+    if direction == 'S' or direction == 'W':
+        dd *= -1
+    return dd
+
+# A function to parse a GPGGA message and return an array with [lat, lon, alt]
+
+
+def parse_gpgga(message):
+    # Split the message by comma
+    fields = message.split(b",")
+    # Check if the message is valid
+    if message.find(b"$GPGGA") != -1 and fields[6] != '0':
+        # Extract the latitude, longitude and altitude
+        lat_deg = fields[2][:2]
+        lat_min = fields[2][2:4]
+        lat_sec = fields[2][5:]
+        lat_dir = fields[3]
+        lon_deg = fields[4][:3]
+        lon_min = fields[4][3:5]
+        lon_sec = fields[4][6:]
+        lon_dir = fields[5]
+        alt = fields[9]
+        # Convert the latitude and longitude from DMS to DD
+        lat = round(dms_to_dd(lat_deg, lat_min, lat_sec, lat_dir), 8)
+        lon = round(dms_to_dd(lon_deg, lon_min, lon_sec, lon_dir), 8)
+        # encode the latitude and longitude as bytes
+        lat = bytes(str(lat), 'utf-8')
+        lon = bytes(str(lon), 'utf-8')
+        # Return an array with [lat, lon, alt]
+        return [lat, lon, alt]
+    else:
+        # Return an empty array if the message is invalid
+        return []
 
 
 # Define a function to process a single file
@@ -25,6 +53,7 @@ def get_date_time(fields):
 def process_file(file_path, output_file):
     # Open the file in binary mode
     date_time_valid = False
+    lat_lon_alt_valid = False
     with open(file_path, "rb") as f:
         # Skip the first two lines
         f.readline()
@@ -35,16 +64,23 @@ def process_file(file_path, output_file):
 
             # if the line has a GPRMC string, write it to the output file
             if line.find(b"$GPRMC") != -1:
-                date_time = get_date_time(fields)
+                date_time = [fields[1], fields[9]]
                 if date_time is not None:
                     date_time_valid = True
 
-            # Skip empty lines, lines that start with PPS, lines that have a special character, or lines that start with a letter
-            if line.strip() and date_time_valid and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
+            if line.find(b"$GPGGA") != -1:
+                lat_lon_alt = parse_gpgga(line)
+                if lat_lon_alt is not None:
+                    lat_lon_alt_valid = True
+
+            # if the line is valid, write it to the output file
+            if line.strip() and date_time_valid and lat_lon_alt and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
                 # remove the newline character from the last field of original line
                 fields[-1] = fields[11].strip()
                 # add the date and time to the end of the line
                 fields.extend(date_time)
+                # add the latitude, longitude and altitude to the end of the line
+                fields.extend(lat_lon_alt)
                 # add a newline character to the end of the line
                 fields[-1] += b"\r\n"
                 line = b",".join(fields)
