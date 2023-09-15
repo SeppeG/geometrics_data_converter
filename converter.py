@@ -73,7 +73,7 @@ def process_file(file_path, output_file):
                     lat_lon_alt_valid = True
 
             # if the line is valid, write it to the output file
-            if line.strip() and date_time_valid and lat_lon_alt and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
+            if line.strip() and date_time_valid and lat_lon_alt_valid and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
                 # remove the newline character from the last field of original line
                 fields[-1] = fields[11].strip()
                 # add the date and time to the end of the line
