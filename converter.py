@@ -51,7 +51,7 @@ def parse_gpgga(message):
 
 def process_file(file_path, output_file):
     # Open the file in binary mode
-    date_time_valid = False
+    time_date_valid = False
     lat_lon_alt_valid = False
     with open(file_path, "rb") as f:
         # Skip the first two lines
@@ -63,9 +63,9 @@ def process_file(file_path, output_file):
 
             # if the line has a GPRMC string, write it to the output file
             if line.find(b"$GPRMC") != -1:
-                date_time = [fields[1], fields[9]]
-                if date_time is not None:
-                    date_time_valid = True
+                time_date = [fields[9], fields[1]]
+                if time_date is not None:
+                    time_date_valid = True
 
             if line.find(b"$GPGGA") != -1:
                 lat_lon_alt = parse_gpgga(line)
@@ -73,11 +73,11 @@ def process_file(file_path, output_file):
                     lat_lon_alt_valid = True
 
             # if the line is valid, write it to the output file
-            if line.strip() and date_time_valid and lat_lon_alt_valid and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
+            if line.strip() and time_date_valid and lat_lon_alt_valid and not line.startswith(b"PPS") and not any(c in b"$#@%^&*!" for c in line) and not re.match(b"[a-zA-Z]", line):
                 # remove the newline character from the last field of original line
                 fields[-1] = fields[11].strip()
                 # add the date and time to the end of the line
-                fields.extend(date_time)
+                fields.extend(time_date)
                 # add the latitude, longitude and altitude to the end of the line
                 fields.extend(lat_lon_alt)
                 # add a newline character to the end of the line
