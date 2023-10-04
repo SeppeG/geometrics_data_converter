@@ -90,7 +90,8 @@ def process_file(file_path, output_file):
 
 def process_zip_or_folder(input_path, output_path):
     # Create the output file name based on the input path
-    output_file_name = os.path.basename(input_path).split(".")[0] + "_data.txt"
+    output_file_name = os.path.basename(input_path).split(".")[
+        0] + "_merged_data.txt"
     # Open the output file in binary mode
     with open(os.path.join(output_path, output_file_name), "wb") as output_file:
         # Check if the input path is a zip file or a regular folder
@@ -100,15 +101,15 @@ def process_zip_or_folder(input_path, output_path):
                 # Get the list of files in the zip file and sort them by natural order (1, 2, 3, ...)
                 files = z.namelist()
                 files = natsort.natsorted(files)
-                # Get the number of files to process (excluding aquinfo.txt)
+                # Get the number of files to process (excluding acquinfo.txt)
                 num_files = len(files) - \
-                    1 if "aquinfo.txt" in files else len(files)
+                    1 if "acquinfo.txt" in files else len(files)
                 # Print the number of files to process
-                print(f"Processing {num_files} files from {input_path}...")
+                print(f"\nProcessing {num_files} files from {input_path}...")
                 # Loop through the sorted files in the zip file
                 for i, name in enumerate(files, start=1):
-                    # Skip the aquinfo.txt file
-                    if name == "aquinfo.txt":
+                    # Skip the acquinfo.txt file
+                    if name == "acquinfo.txt":
                         continue
                     # Extract the file to a temporary folder
                     z.extract(name, "temp")
@@ -117,35 +118,27 @@ def process_zip_or_folder(input_path, output_path):
                     # Process the file
                     process_file(os.path.join("temp", name),
                                  output_file)
-            # Copy the aquinfo.txt file to the output folder if it exists
-            aquinfo_path = os.path.join("temp", "aquinfo.txt")
-            if os.path.exists(aquinfo_path):
-                shutil.copy(aquinfo_path, output_path)
             # Remove the temporary folder
             shutil.rmtree("temp")
         else:
             # Get the list of files in the regular folder and sort them by natural order (1, 2, 3, ...)
             files = os.listdir(input_path)
             files = natsort.natsorted(files)
-            # Get the number of files to process (excluding aquinfo.txt)
+            # Get the number of files to process (excluding acquinfo.txt)
             num_files = len(files) - \
-                1 if "aquinfo.txt" in files else len(files)
+                1 if "acquinfo.txt" in files else len(files)
             # Print the number of files to process
-            print(f"Processing {num_files} files from {input_path}...")
+            print(f"\nProcessing {num_files} files from {input_path}...")
             # Loop through the sorted files in the regular folder
             for i, name in enumerate(files, start=1):
-                # Skip the aquinfo.txt file
-                if name == "aquinfo.txt":
+                # Skip the acquinfo.txt file
+                if name == "acquinfo.txt":
                     continue
                 # Print the current file name and number
                 print(f"Processing file {i} of {num_files}: {name}")
                 # Process the file
                 process_file(os.path.join(input_path, name),
                              output_file)
-            # Copy the aquinfo.txt file to the output folder if it exists
-            aquinfo_path = os.path.join(input_path, "aquinfo.txt")
-            if os.path.exists(aquinfo_path):
-                shutil.copy(aquinfo_path, output_path)
 
 
 # Get the number of arguments passed to the script
@@ -159,9 +152,9 @@ if num_args == 1:
     # Create the output folder if it does not exist
     if not os.path.exists(output_path):
         os.mkdir(output_path)
-    # Find all zip files in ./data that start with ACQU and process them
-    for zip_file in glob.glob(os.path.join(input_path, "ACQU*.zip")):
-        process_zip_or_folder(zip_file, output_path)
+    # Find all files in ./raw_data that start with ACQU and process them
+    for folder in glob.glob(os.path.join(input_path, "ACQU*")):
+        process_zip_or_folder(folder, output_path)
 # Check if two arguments are passed (input and output paths)
 elif num_args == 3:
     # Get the input and output paths from the arguments as relative paths
