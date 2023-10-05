@@ -2,7 +2,7 @@
 
 > Convert Acquisition data from the Geometrics MFAM Development Kit to a single txt file
 
-This is a python script that reads a zip file or a regular folder containing multiple files named 1.txt 2.txt 3.txt … (charset=binary) and one file named aquinfo.txt and merges the files starting with a number into one big txt file, on each separate file, the first 2 lines need to be removed, as well as any empty lines, in the end you should have a new folder named <folder_name> containing one txt file named <folder_name>_data.txt and one file aquinfo.txt. The output txt file is also in binary txt.
+This is a python script that reads a zip file or a regular folder containing multiple files named 1.txt 2.txt 3.txt … (charset=binary) and one file named aquinfo.txt and merges the files starting with a number into one big txt file, on each separate file, the first 2 lines need to be removed, as well as any empty lines, in the end you should have a new folder named <folder_name> containing one txt file named <folder_name>_data.txt. The output txt file is also in binary txt, comma seperated.
 
 ## Requirements
 
