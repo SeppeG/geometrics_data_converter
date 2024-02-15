@@ -53,12 +53,14 @@ def process_file(file_path, output_file):
     # Open the file in binary mode
     time_date_valid = False
     lat_lon_alt_valid = False
+    i = 0
     with open(file_path, "rb") as f:
         # Skip the first two lines
         f.readline()
         f.readline()
         # Read the rest of the file and write to the output file
         for line in f:
+            i += 1
             fields = line.split(b",")
 
             # if the line has a GPRMC string, write it to the output file
@@ -68,7 +70,11 @@ def process_file(file_path, output_file):
                     time_date_valid = True
 
             if line.find(b"$GPGGA") != -1:
-                lat_lon_alt = parse_gpgga(line)
+                try:
+                    lat_lon_alt = parse_gpgga(line)
+                except:
+                    # Print the GPGGA message with line number if it cannot be parsed
+                    print(f"Error parsing GPGGA message: {line} from line {i} in file {file_path}")
                 if lat_lon_alt is not None:
                     lat_lon_alt_valid = True
 
