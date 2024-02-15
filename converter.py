@@ -19,23 +19,31 @@ def dms_to_dd(degrees, minutes, seconds, direction):
 
 
 def parse_gpgga(message):
-    # Split the message by comma
-    fields = message.split(b",")
+    gpgga_index = message.find(b"$GPGGA")
     # Check if the message is valid
-    if message.find(b"$GPGGA") != -1 and fields[6] != '0':
-        # Extract the latitude, longitude and altitude
-        lat_deg = fields[2][:2]
-        lat_min = fields[2][2:4]
-        lat_sec = fields[2][5:]
+    if gpgga_index != -1:
+        message = message[gpgga_index:]
+        # Split the message by commas into fields
+        fields = message.split(b",")
+
+        # Check if the message is valid
+        if fields[6] == b"0":
+            return []
+        
+        # Find the index of the decimal point in the latitude and longitude fields
+        lat_index = fields[2].find(b".")
+        lon_index = fields[4].find(b".")
+        # Slice the fields to get the degrees, minutes and seconds
+        lat_deg = fields[2][:lat_index - 2]
+        lat_min = fields[2][lat_index - 2:]
         lat_dir = fields[3]
-        lon_deg = fields[4][:3]
-        lon_min = fields[4][3:5]
-        lon_sec = fields[4][6:]
+        lon_deg = fields[4][:lon_index - 2]
+        lon_min = fields[4][lon_index - 2:]
         lon_dir = fields[5]
         alt = fields[9]
         # Convert the latitude and longitude from DMS to DD
-        lat = round(dms_to_dd(lat_deg, lat_min, lat_sec, lat_dir), 8)
-        lon = round(dms_to_dd(lon_deg, lon_min, lon_sec, lon_dir), 8)
+        lat = round(dms_to_dd(lat_deg, lat_min, 0, lat_dir), 8)
+        lon = round(dms_to_dd(lon_deg, lon_min, 0, lon_dir), 8)
         # encode the latitude and longitude as bytes
         lat = bytes(str(lat), 'utf-8')
         lon = bytes(str(lon), 'utf-8')
@@ -53,6 +61,7 @@ def process_file(file_path, output_file):
     # Open the file in binary mode
     time_date_valid = False
     lat_lon_alt_valid = False
+    lat_lon_alt = None
     i = 0
     with open(file_path, "rb") as f:
         # Skip the first two lines
