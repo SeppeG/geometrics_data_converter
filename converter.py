@@ -7,6 +7,8 @@ import glob
 import re
 import natsort
 
+HEADER = b"ID,Fiducial,FrameID,SysStat,Mag1D,Mag1S,Mag2D,Mag2S,Aux0,Aux1,Aux2,Aux3,Date,UTC,Lat,Lon,Alt\r\n" # Header (message definition) for the output file
+
 
 # A function to convert degrees, minutes, seconds (DMS) to decimal degrees (DD)
 def dms_to_dd(degrees, minutes, seconds, direction):
@@ -74,9 +76,14 @@ def process_file(file_path, output_file):
 
             # if the line has a GPRMC string, write it to the output file
             if line.find(b"$GPRMC") != -1:
-                time_date = [fields[9], fields[1]]
-                if time_date is not None:
-                    time_date_valid = True
+                if len(fields[9]) == 6:
+                    day=fields[9][0:2]
+                    month=fields[9][2:4]
+                    year=fields[9][4:6]
+                    year = b"20" + year
+                    time_date = [month + b"/" + day + b"/" + year, fields[1]]
+                    if time_date is not None:
+                        time_date_valid = True
 
             if line.find(b"$GPGGA") != -1:
                 try:
@@ -107,8 +114,12 @@ def process_zip_or_folder(input_path, output_path):
     # Create the output file name based on the input path
     output_file_name = os.path.basename(input_path).split(".")[
         0] + "_merged_data.txt"
+
     # Open the output file in binary mode
     with open(os.path.join(output_path, output_file_name), "wb") as output_file:
+        # Print the output file name
+        output_file.write(HEADER)
+        
         # Check if the input path is a zip file or a regular folder
         if input_path.endswith(".zip"):
             # Open the zip file
